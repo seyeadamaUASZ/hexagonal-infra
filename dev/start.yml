@@ -36,7 +36,7 @@ metadata: # Metadata of the resource kind we are creating
   name: start-svc
 spec:
   selector:
-    app: bookstore
+    app: start
   ports:
     - protocol: "TCP"
       port: 9090 # The port that the service is running on in the cluster
