@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: start
+spec:
+  selector:
+    matchLabels:
+      app: start
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: start
+    spec:
+      containers:
+        - name: start
+          image: adama93/start
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9090
+            initialDelaySeconds: 5
+          livenessProbe:
+              httpGet:
+                path: /actuator/health
+                port: 9090
+              initialDelaySeconds: 5
+          restartPolicy: Always
+          env:   # Setting Enviornmental Variables
+            - name: DB_HOST   # Setting Database host address from configMap
+              value: postgres
+            - name: DB_NAME  # Setting Database name from configMap
+              value: employee_db
+            - name: DB_USERNAME  # Setting Database username from Secret
+              value: admin
+            - name: DB_PASSWORD # Setting Database password from Secret
+              value: passer123
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: start-svc
+spec:
+  selector:
+    app: bookstore
+  ports:
+    - protocol: "TCP"
+      port: 9090 # The port that the service is running on in the cluster
+      targetPort: 9090 # The port exposed by the service
+  type: NodePort # type of the service.
